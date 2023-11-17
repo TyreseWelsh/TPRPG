@@ -263,28 +263,25 @@ void ATPRPGCharacter::DrawSpell()
 			FHitResult result;
 			PlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Camera), true, result);
 			
-			//if (result.GetComponent()->GetCollisionObjectType() == ECC_SpellPoint)
-			//{
-				if (result.GetComponent()->GetOwner()->Implements<USpellPoint>())
+			if (result.GetComponent()->GetOwner()->Implements<USpellPoint>())
+			{
+				UE_LOG(LogTemplateCharacter, Error, TEXT("IMPLEMENTS INTERFACE"));
+
+				AActor* HitSpellPoint = result.GetComponent()->GetOwner();
+				ISpellPoint* SpellPointInterface = Cast<ISpellPoint>(HitSpellPoint);															// Object interface we are using currently (hit spellpoint)
+
+				FString PointNum = SpellPointInterface->Execute_EnablePoint(HitSpellPoint);
+
+				if (PointNum != LastSpellPoint)
 				{
-					UE_LOG(LogTemplateCharacter, Error, TEXT("IMPLEMENTS INTERFACE"));
-
-					AActor* HitSpellPoint = result.GetComponent()->GetOwner();
-					ISpellPoint* SpellPointInterface = Cast<ISpellPoint>(HitSpellPoint);															// Object interface we are using currently (hit spellpoint)
-
-					FString PointNum = SpellPointInterface->Execute_EnablePoint(HitSpellPoint);
-
-					if (PointNum != LastSpellPoint)
-					{
-						//UE_LOG(LogTemplateCharacter, Error, TEXT("COLLIDED WITH SPELLPOINT %s"), *result.GetComponent()->GetOwner()->GetFName().ToString());
-						UE_LOG(LogTemplateCharacter, Error, TEXT("COLLIDED WITH SPELLPOINT %s"), *PointNum);
-						//SpellPoints.Append(result.GetComponent()->GetOwner()->GetFName().ToString());
-						SpellPoints.Append(PointNum);
-					}
-
-					LastSpellPoint = PointNum;
+					//UE_LOG(LogTemplateCharacter, Error, TEXT("COLLIDED WITH SPELLPOINT %s"), *result.GetComponent()->GetOwner()->GetFName().ToString());
+					UE_LOG(LogTemplateCharacter, Error, TEXT("COLLIDED WITH SPELLPOINT %s"), *PointNum);
+					//SpellPoints.Append(result.GetComponent()->GetOwner()->GetFName().ToString());
+					SpellPoints.Append(PointNum);
 				}
-			//}
+
+				LastSpellPoint = PointNum;
+			}
 
 			if (SpellPoints.Len() >= MAX_SPELL_LENGTH)
 			{
@@ -308,7 +305,7 @@ void ATPRPGCharacter::SetupInitialSpells()
 {
 	AvailableSpells["Fireball"] = FString(TEXT("27542"));
 	AvailableSpells["Frostbolt"] = FString(TEXT("27452"));
-	AvailableSpells["LightningBolt"] = FString(TEXT("76512"));
+	AvailableSpells["Lightningbolt"] = FString(TEXT("76321"));
 }
 
 void ATPRPGCharacter::CreateSpell()
@@ -323,6 +320,11 @@ void ATPRPGCharacter::CreateSpell()
 		currentLookState = ELookState::Aiming;
 		Spell_FrostBolt();
 	}
+	else if (SpellPoints == AvailableSpells["Lightningbolt"])
+	{
+		currentLookState = ELookState::Aiming;
+		Spell_LightningBolt();
+	}
 	else
 	{
 		UE_LOG(LogTemplateCharacter, Error, TEXT("INVALID SPELL COMBINATION"));
@@ -334,10 +336,17 @@ void ATPRPGCharacter::CreateSpell()
 void ATPRPGCharacter::Spell_FireBall()
 {
 	UE_LOG(LogTemplateCharacter, Error, TEXT("Fire Ball!"));
+	AActor* Fireball = GetWorld()->SpawnActor<AActor>(BP_Fireball, FVector(LastMousePosition.X, LastMousePosition.Y, LastMousePosition.Z + SpellSpawnHeight), FRotator(0, 0, 0));
 }
 
 void ATPRPGCharacter::Spell_FrostBolt()
 {
 	UE_LOG(LogTemplateCharacter, Error, TEXT("Frost Bolt!"));
-	AActor* FrostBolt = GetWorld()->SpawnActor<AActor>(BP_FrostBolt, FVector(LastMousePosition.X, LastMousePosition.Y, LastMousePosition.Z + SpellSpawnHeight), FRotator(0, 0, 0));
+	AActor* Frostbolt = GetWorld()->SpawnActor<AActor>(BP_Frostbolt, FVector(LastMousePosition.X, LastMousePosition.Y, LastMousePosition.Z + SpellSpawnHeight), FRotator(0, 0, 0));
+}
+
+void ATPRPGCharacter::Spell_LightningBolt()
+{
+	UE_LOG(LogTemplateCharacter, Error, TEXT("Lightning Bolt!"));
+	AActor* Lightningbolt = GetWorld()->SpawnActor<AActor>(BP_Lightningbolt, FVector(LastMousePosition.X, LastMousePosition.Y, LastMousePosition.Z), FRotator(0, 0, 0));
 }

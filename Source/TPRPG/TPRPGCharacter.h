@@ -46,10 +46,13 @@ class ATPRPGCharacter : public ACharacter
 	int SpellSpawnHeight;
 
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<AActor> BP_FrostBolt;
+	TSubclassOf<AActor> BP_Frostbolt;
 
-	//UPROPERTY(BlueprintReadOnly, Category = Magic, meta = (AllowPrivateAccess = "true"))
-	//BP_4E_Base_ProjectileAlt* FrostBolt;
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AActor> BP_Fireball;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AActor> BP_Lightningbolt;
 	
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -168,5 +171,6 @@ public:
 	AActor* CurrentSpell;
 	void Spell_FireBall();
 	void Spell_FrostBolt();
+	void Spell_LightningBolt();
 };
 
